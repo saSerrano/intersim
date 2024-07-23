@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from copy import copy, deepcopy
 from sklearn.cluster import KMeans
 
 from mushroom_rl.algorithms.value import QLearning
@@ -7,7 +8,7 @@ from mushroom_rl.core import Core
 from mushroom_rl.environments import *
 from mushroom_rl.policy import EpsGreedy
 
-def rl():
+def rl(task_name):
     '''
     Perform Q-learning
 
@@ -119,13 +120,74 @@ def intersection_mats(q1,q2,n_clusters=2):
 
     return inter_a, inter_s
 
-def transfer(src_q,tgt_q,inter_a,inter_s):
-    # Transfer Q-values from one Q-table to another, given their intersection matrices
-    print(0)
+def intertask_similarity(inter_a,inter_s):
+    '''
+    DESCRIPTION
+
+    Computes the mean/frobenius-based similarity scores
+    of two Q-tables, given their action and state inter-
+    section matrices.
+
+    INPUT
+
+    inter_a (np-array): action intersection matrix.
+    inter_s (np-array): state intersection matrix.
+
+    OUTPUT
+
+    mean_a (np-array): mean-based action similarity score.
+    mean_s (np-array): mean-based state similarity score.
+    frob_a (np-array): frobenius-based action similarity score.
+    frob_s (np-array): frobenius-based state similarity score.
+    '''
+    mean_a = float(np.mean(inter_a))
+    mean_s = float(np.mean(inter_s))
+    frob_a = np.linalg.norm(inter_a,'fro')
+    frob_s = np.linalg.norm(inter_s,'fro')
+    return mean_a, mean_s, frob_a, frob_s
+
+def transfer(src_q,inter_a,inter_s):
+    '''
+    DESCRIPTION
+
+    Computes the Q-table for the target task, trans-
+    ferred from the source task Q-table.
+
+    INPUT
+
+    src_q   (np-array): source task Q-table.
+    inter_a (np-array): action intersection matrix.
+    inter_s (np-array): state intersection matrix.
+
+    OUTPUT
+
+    tgt_q   (np-array): transferred target task Q-table.
+    '''
+    # Select the most similar source state-action pair to each
+    # target state-action pair
+    tgt_q = np.zeros((inter_s.shape[1],inter_a.shape[1]),dtype=np.float64)
+    for i in range(tgt_q.shape[0]):
+        ms_state = np.argmax(inter_s[:,i])
+        for j in range(tgt_q.shape[1]):
+            ms_action = np.argmax(inter_a[:,j])
+            tgt_q[i,j] = copy(src_q[ms_state,ms_action])
+    
+    return tgt_q
 
 def main():
-    # 
-    print(0)
+    # Learn Q tables
+    q1 = rl('task 1')
+    q2 = rl('task 2')
+
+    # Compute instersection matrices
+    n_clusters = 2
+    inter_a, inter_s = intersection_mats(q1,q2,n_clusters)
+
+    # Measure similarity scores
+    ma,ms,fa,fs = intertask_similarity(inter_a,inter_s)
+
+    # Transfer Q-values
+    tl_q2 = transfer(q1,inter_a,inter_s)
 
 if __name__ == '__main__':
     main()
