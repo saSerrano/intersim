@@ -441,17 +441,48 @@ def main():
     # # Transfer Q-values
     # tl_q2 = transfer(q1,inter_a,inter_s)
 
+def getQ(agent):
+    '''
+    DESCRIPTION
+
+    Extract a copy of the Q-table of an RL agent.
+
+    INPUT
+
+    agent (mushroom_rl.core.Agent): RL agent.
+
+    OUTPUT
+
+    q (np-array): Q table where rows and columns re-
+    present states and action, respectively.
+    '''
+    q = np.copy(agent.Q.table)
+    return q
+
+def setQ(agent,q):
+    '''
+    DESCRIPTION
+
+    Set values for the Q-table of an RL agent.
+
+    INPUT
+
+    agent (mushroom_rl.core.Agent): RL agent whose Q-
+    table will be modified.
+    q (np-array): Q table where rows and columns re-
+    present states and action, respectively.
+    '''
+    assert q.shape == agent.Q.table.shape
+    agent.Q.table = np.copy(q)
+
 if __name__ == '__main__':
-    q = np.array([[0.1,0.2], [0.3,0.4]])
-    inter_a = np.arange(4).reshape(2,2).astype(float)
-    inter_s = np.arange(4).reshape(2,2).astype(float)*2.0
-    ma,ms,fa,fs = intertask_similarity(inter_a,inter_s)
-    print('------source Q table')
+    agent = QLearning.load('/home/sergio/code/intersim/tmp/agent.msh')
+    q = getQ(agent)
+    print('Loaded Q')
     print(q)
-    print('------int a')
-    print(inter_a)
-    print('------int s')
-    print(inter_s)
-    qt = transfer(q,inter_a,inter_s)
-    print('------target Q table')
-    print(qt)
+
+    setQ(agent,np.ones(q.shape))
+
+    q = getQ(agent)
+    print('New Q')
+    print(q)
