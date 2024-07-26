@@ -3,7 +3,7 @@ import numpy as np
 from copy import copy,deepcopy
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
-import utils
+import intersim.utils as utils
 
 from mushroom_rl.environments.gym_env import Gym
 from mushroom_rl.algorithms.value import QLearning
@@ -46,16 +46,6 @@ class DecayParameter(Parameter):
         n = np.maximum(self._n_updates[idx], 1)
 
         return self._initial_value / n ** self._exp
-
-# Print Q-table
-# shape = agent.Q.shape
-# q = np.zeros(shape)
-# for i in range(shape[0]):
-#     for j in range(shape[1]):
-#         state = np.array([i])
-#         action = np.array([j])
-#         q[i, j] = agent.Q.predict(state, action)
-# print(q)
 
 def meanEpisodicReward(data):
     '''
@@ -424,23 +414,6 @@ def transfer(src_q,inter_a,inter_s):
     
     return tgt_q
 
-def main():
-    print(0)
-
-    # # Learn Q tables
-    # q1 = rl('task 1')
-    # q2 = rl('task 2')
-
-    # # Compute instersection matrices
-    # n_clusters = 2
-    # inter_a, inter_s = intersection_mats(q1,q2,n_clusters)
-
-    # # Measure similarity scores
-    # ma,ms,fa,fs = intertask_similarity(inter_a,inter_s)
-
-    # # Transfer Q-values
-    # tl_q2 = transfer(q1,inter_a,inter_s)
-
 def getQ(agent):
     '''
     DESCRIPTION
@@ -474,15 +447,3 @@ def setQ(agent,q):
     '''
     assert q.shape == agent.Q.table.shape
     agent.Q.table = np.copy(q)
-
-if __name__ == '__main__':
-    agent = QLearning.load('/home/sergio/code/intersim/tmp/agent.msh')
-    q = getQ(agent)
-    print('Loaded Q')
-    print(q)
-
-    setQ(agent,np.ones(q.shape))
-
-    q = getQ(agent)
-    print('New Q')
-    print(q)
