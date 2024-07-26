@@ -257,7 +257,19 @@ def rl(parameters):
 
 def cluster(m,n_clusters,mode):
     '''
+    DESCRIPTION
+
     Cluster the elements in each row (or column) and return the assigned labels.
+
+    INPUT
+
+    m (np-array): input matrix.
+    n_clusters (int): number of clusters.
+    mode (str): 'row' or 'columns'.
+
+    OUTPUT
+
+    labels (np-array): matrix of assigned labels.
     '''
     assert len(m.shape) == 2 and n_clusters >= 2 and mode in ['rows','columns']
     
@@ -275,10 +287,11 @@ def cluster(m,n_clusters,mode):
 
         # Sort clusters by their centroid
         l, c = km.labels_, km.cluster_centers_.flatten()
-        cluster_ids = [(j,c[j]) for j in range(c.shape[0])].sort(key=lambda y : y[1])
+        cluster_ids = [(j,c[j]) for j in range(c.shape[0])]
+        cluster_ids.sort(key=lambda y : y[1])
         id_map = {}
         for j in range(len(cluster_ids)):
-            id_map[cluster_ids[0]] = j
+            id_map[cluster_ids[j][0]] = j
         for j in range(a.shape[1]):
             labels[i,j] = id_map[l[j]]
     
@@ -341,18 +354,18 @@ def intersection_mats(q1,q2,n_clusters=2):
     fs1 = label_histograms(cluster(q1,n_clusters,'columns'),n_clusters,'rows')
     fa2 = label_histograms(cluster(q2,n_clusters,'rows'),n_clusters,'columns')
     fs2 = label_histograms(cluster(q2,n_clusters,'columns'),n_clusters,'rows')
-    
+
     # Compute intersection matrices
     inter_a, inter_s = np.zeros((fa1.shape[0],fa2.shape[0]),dtype=np.float64), np.zeros((fs1.shape[0],fs2.shape[0]),dtype=np.float64)
     for i in range(inter_a.shape[0]):
         for j in range(inter_a.shape[1]):
             # Intersection of histograms
-            tmp = np.concatenate((np.copy(fa1[i,:]).reshape(1,n_clusters),np.copy(fa2[i,:]).reshape(1,n_clusters)),axis=0)
+            tmp = np.concatenate((np.copy(fa1[i,:]).reshape(1,n_clusters),np.copy(fa2[j,:]).reshape(1,n_clusters)),axis=0)
             inter_a[i,j] = np.sum(np.min(tmp,axis=0))
     for i in range(inter_s.shape[0]):
         for j in range(inter_s.shape[1]):
             # Intersection of histograms
-            tmp = np.concatenate((np.copy(fs1[i,:]).reshape(1,n_clusters),np.copy(fs2[i,:]).reshape(1,n_clusters)),axis=0)
+            tmp = np.concatenate((np.copy(fs1[i,:]).reshape(1,n_clusters),np.copy(fs2[j,:]).reshape(1,n_clusters)),axis=0)
             inter_s[i,j] = np.sum(np.min(tmp,axis=0))
 
     return inter_a, inter_s
@@ -430,19 +443,26 @@ def main():
 
 if __name__ == '__main__':
     # main()
-    params = {}
-    params['task_name'] = 'FrozenLake-v1'
-    params['horizon'] = 100
-    params['gamma'] = 0.95
-    params['training_episodes'] = None
-    params['n_training_episodes_per_eval'] = 100
-    params['training_steps'] = 10000
-    params['n_training_steps_per_eval'] = 1000
-    params['epsilon_init'] = 1.0
-    params['epsilon_final'] = 0.1
-    params['learning_rate_init'] = 0.10
-    params['learning_rate_final'] = 0.01
-    params['final_value_time'] = 0.5
-    params['save_data'] = False
-    params['output_dir'] = '/home/sergio/code/intersim/tmp'
-    rl(params)
+    # params = {}
+    # params['task_name'] = 'FrozenLake-v1'
+    # params['horizon'] = 100
+    # params['gamma'] = 0.95
+    # params['training_episodes'] = None
+    # params['n_training_episodes_per_eval'] = 100
+    # params['training_steps'] = 10000
+    # params['n_training_steps_per_eval'] = 1000
+    # params['epsilon_init'] = 1.0
+    # params['epsilon_final'] = 0.1
+    # params['learning_rate_init'] = 0.10
+    # params['learning_rate_final'] = 0.01
+    # params['final_value_time'] = 0.5
+    # params['save_data'] = False
+    # params['output_dir'] = '/home/sergio/code/intersim/tmp'
+    # rl(params)
+    q1 = np.array([[0.1,0.3,0.5], [-0.2,0.9,0.3], [0.7,-0.5,0.4]])
+    q2 = np.array([[-0.3,0.9,0.1,0.8], [0.2,0.6,-0.1,0.3]])
+    inter_a, inter_s = intersection_mats(q1,q2,2)
+    # print('-------------- INTER-A')
+    # print(inter_a)
+    # print('-------------- INTER-S')
+    # print(inter_s)
