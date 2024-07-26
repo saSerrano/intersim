@@ -442,27 +442,16 @@ def main():
     # tl_q2 = transfer(q1,inter_a,inter_s)
 
 if __name__ == '__main__':
-    # main()
-    # params = {}
-    # params['task_name'] = 'FrozenLake-v1'
-    # params['horizon'] = 100
-    # params['gamma'] = 0.95
-    # params['training_episodes'] = None
-    # params['n_training_episodes_per_eval'] = 100
-    # params['training_steps'] = 10000
-    # params['n_training_steps_per_eval'] = 1000
-    # params['epsilon_init'] = 1.0
-    # params['epsilon_final'] = 0.1
-    # params['learning_rate_init'] = 0.10
-    # params['learning_rate_final'] = 0.01
-    # params['final_value_time'] = 0.5
-    # params['save_data'] = False
-    # params['output_dir'] = '/home/sergio/code/intersim/tmp'
-    # rl(params)
-    q1 = np.array([[0.1,0.3,0.5], [-0.2,0.9,0.3], [0.7,-0.5,0.4]])
-    q2 = np.array([[-0.3,0.9,0.1,0.8], [0.2,0.6,-0.1,0.3]])
-    inter_a, inter_s = intersection_mats(q1,q2,2)
-    # print('-------------- INTER-A')
-    # print(inter_a)
-    # print('-------------- INTER-S')
-    # print(inter_s)
+    q = np.array([[0.1,0.2], [0.3,0.4]])
+    inter_a = np.arange(4).reshape(2,2).astype(float)
+    inter_s = np.arange(4).reshape(2,2).astype(float)*2.0
+    ma,ms,fa,fs = intertask_similarity(inter_a,inter_s)
+    print('------source Q table')
+    print(q)
+    print('------int a')
+    print(inter_a)
+    print('------int s')
+    print(inter_s)
+    qt = transfer(q,inter_a,inter_s)
+    print('------target Q table')
+    print(qt)

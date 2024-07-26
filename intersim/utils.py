@@ -194,3 +194,31 @@ def loadDataset(fname):
         data.append((s,a,r,s1,absorb,last))
     
     return data,s_dim,a_dim,s_is_discrete,a_is_discrete
+
+def generateRLExperiment():
+    '''
+    DESCRIPTION
+
+    Genereates a template dictionary with the necessary
+    parameters to train an RL agent.
+
+    OUTPUT
+
+    params (dict): dictionary with RL parameters.
+    '''
+    params = {}
+    params['task_name'] = 'FrozenLake-v1'
+    params['horizon'] = 100
+    params['gamma'] = 0.95
+    params['training_episodes'] = None
+    params['n_training_episodes_per_eval'] = 100
+    params['training_steps'] = 10000
+    params['n_training_steps_per_eval'] = 1000
+    params['epsilon_init'] = 1.0
+    params['epsilon_final'] = 0.1
+    params['learning_rate_init'] = 0.10
+    params['learning_rate_final'] = 0.01
+    params['final_value_time'] = 0.5
+    params['save_data'] = False
+    params['output_dir'] = '/tmp/rl_experiment'
+    return params
